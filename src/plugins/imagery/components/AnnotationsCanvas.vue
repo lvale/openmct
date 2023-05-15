@@ -51,6 +51,14 @@ export default {
             default() {
                 return [];
             }
+        },
+        zoomFactor: {
+            type: Number,
+            required: true
+        },
+        sizedImageDimensions: {
+            type: Object,
+            required: true
         }
     },
     data() {
@@ -66,19 +74,29 @@ export default {
             indexToAnnotationMap: {}
         };
     },
+    computed: {
+        canvasWidth() {
+            return Math.floor(this.sizedImageDimensions.width * window.devicePixelRatio);
+        },
+        canvasHeight() {
+            return Math.floor(this.sizedImageDimensions.height * window.devicePixelRatio);
+        }
+    },
     watch: {
         imageryAnnotations() {
             this.buildAnnotationIndex();
+        },
+        sizedImageDimensions() {
+            this.canvas.width = this.canvasWidth;
+            this.canvas.height = this.canvasHeight;
         }
     },
     mounted() {
         this.canvas = this.$refs.canvas;
         this.context = this.canvas.getContext("2d");
 
-        // adjust canvas size for retina displays
-        const scale = window.devicePixelRatio;
-        this.canvas.width = Math.floor(this.canvas.width * scale);
-        this.canvas.height = Math.floor(this.canvas.height * scale);
+        this.canvas.width = this.canvasWidth;
+        this.canvas.height = this.canvasHeight;
 
         this.keyString = this.openmct.objects.makeKeyString(this.domainObject.identifier);
         this.openmct.selection.on('change', this.updateSelection);
@@ -163,7 +181,7 @@ export default {
             this.context.stroke();
         },
         trackAnnotationDrag(event) {
-            if (this.mouseDown && !this.dragging && event.shiftKey && event.altKey) {
+            if (this.mouseDown && !this.dragging && event.shiftKey) {
                 this.startAnnotationDrag(event);
             } else if (this.dragging) {
                 const boundingRect = this.canvas.getBoundingClientRect();

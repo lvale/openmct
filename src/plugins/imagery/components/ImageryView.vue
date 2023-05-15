@@ -100,6 +100,8 @@
                     v-if="shouldDisplayAnnotations"
                     :image="focusedImage"
                     :imagery-annotations="imageryAnnotations[focusedImage.time]"
+                    :zoom-factor="zoomFactor"
+                    :sized-image-dimensions="sizedImageDimensions"
                     @annotationMarqueed="handlePauseButton(true)"
                 />
             </div>
@@ -437,9 +439,7 @@ export default {
                 && this.focusedImageNaturalAspectRatio !== undefined
                 && this.imageContainerWidth !== undefined
                 && this.imageContainerHeight !== undefined
-                && imageHeightAndWidth
-                && this.zoomFactor === 1
-                && this.imagePanned !== true;
+                && imageHeightAndWidth;
 
             return display;
         },
